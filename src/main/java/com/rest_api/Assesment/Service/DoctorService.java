@@ -14,11 +14,12 @@ public class DoctorService {
 	@Autowired
 	private DoctorRepository doctorRepository;
 
-
+	//adding the doctor file
 	public Object addDoctor(Doctor doctor) {
 		doctorRepository.save(doctor);
 		return ResponseEntity.ok("Doctor added...");
 	}
+	//for fetching the doctor by id
 	public Doctor findById(int docId) throws InvalidIDException {
 		Optional<Doctor> doctor=doctorRepository.findById(docId);
 		if(doctor==null) {

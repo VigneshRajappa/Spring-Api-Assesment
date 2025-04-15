@@ -1,5 +1,6 @@
 package com.rest_api.Assesment.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +18,24 @@ public class PatientDoctorService {
 
 	@Autowired
 	private PatientDoctorRepository patientDoctorRepository;
+	@Autowired
+	private DoctorService doctorService;
 	
-	
-	public List<PatientDoctor> getByDoctorId(int docId) throws InvalidIDException {
-		List<PatientDoctor> list=patientDoctorRepository.getPatientDoctorById(docId);
+	//fetching the patients by doctor id
+	public List<Patient> getByDoctorId(int docId) throws InvalidIDException {
+		//first finding the details by its id
+		//store it in a variable
+		//patient and doctor will be in many to many relationship
+		Doctor optional=doctorService.findById(docId);
+		//here we are getting the patient data which are in the doctor
+		List<PatientDoctor> list=patientDoctorRepository.findByDoctor(optional);
 		if(list.isEmpty())
 			throw new InvalidIDException("Given Doctor id is Invalid....");
-		return list;
+		//storing the list for patient
+		List<Patient> patients = new ArrayList<>();
+		list.forEach(dp -> patients.add(dp.getPatient()));
+		return patients;
+
 	}
 
 

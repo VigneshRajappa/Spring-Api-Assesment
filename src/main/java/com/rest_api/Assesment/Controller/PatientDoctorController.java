@@ -35,7 +35,7 @@ public class PatientDoctorController {
 		return patientDoctorService.addPatientDoctor(patientDoctor);
 	}
 	@GetMapping("/api/patinet/getByDoctorId/{docId}")
-	public List<PatientDoctor> getByDoctorId(@PathVariable int docId) throws InvalidIDException {
+	public List<Patient> getByDoctorId(@PathVariable int docId) throws InvalidIDException {
 		return patientDoctorService.getByDoctorId(docId);
 	}
 }

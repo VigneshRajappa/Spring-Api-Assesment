@@ -2,6 +2,7 @@ package com.rest_api.Assesment.Service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -30,6 +31,9 @@ public class PatientDoctorServiceTest {
 
 	@InjectMocks
     private PatientDoctorService patientDoctorService;
+
+    @Mock
+    private DoctorService doctorService;
 
     @Mock
     private PatientDoctorRepository patientDoctorRepository;
@@ -66,30 +70,36 @@ public class PatientDoctorServiceTest {
     }
 
     @Test
-    public void testGetByDoctorId_ValidDoctorId_ReturnsList() throws InvalidIDException {
+    public void testGetByDoctorId_ValidDoctorId_ReturnsPatientList() throws InvalidIDException {
         int docId = 1;
-        List<PatientDoctor> expectedList = Arrays.asList(pd1, pd2);
+        List<PatientDoctor> patientDoctorList = Arrays.asList(pd1, pd2);
 
-        when(patientDoctorRepository.getPatientDoctorById(docId)).thenReturn(expectedList);
+        when(doctorService.findById(docId)).thenReturn(doctor);
+        when(patientDoctorRepository.findByDoctor(doctor)).thenReturn(patientDoctorList);
 
-        List<PatientDoctor> actualList = patientDoctorService.getByDoctorId(docId);
+        List<Patient> result = patientDoctorService.getByDoctorId(docId);
 
-        assertEquals(2, actualList.size());
-        assertEquals(expectedList, actualList);
-        verify(patientDoctorRepository, times(1)).getPatientDoctorById(docId);
+        assertEquals(2, result.size());
+        assertTrue(result.contains(patient1));
+        assertTrue(result.contains(patient2));
+
+        verify(doctorService, times(1)).findById(docId);
+        verify(patientDoctorRepository, times(1)).findByDoctor(doctor);
     }
 
     @Test
-    public void testGetByDoctorId_InvalidDoctorId_ThrowsException() {
+    public void testGetByDoctorId_InvalidDoctorId_ThrowsException() throws InvalidIDException {
         int docId = 99;
 
-        when(patientDoctorRepository.getPatientDoctorById(docId)).thenReturn(Collections.emptyList());
+        when(doctorService.findById(docId)).thenReturn(doctor);
+        when(patientDoctorRepository.findByDoctor(doctor)).thenReturn(Collections.emptyList());
 
         InvalidIDException exception = assertThrows(InvalidIDException.class, () -> {
             patientDoctorService.getByDoctorId(docId);
         });
 
         assertEquals("Given Doctor id is Invalid....", exception.getMessage());
-        verify(patientDoctorRepository, times(1)).getPatientDoctorById(docId);
+        verify(doctorService, times(1)).findById(docId);
+        verify(patientDoctorRepository, times(1)).findByDoctor(doctor);
     }
 }
